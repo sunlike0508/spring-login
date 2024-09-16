@@ -325,6 +325,9 @@ public interface HandlerInterceptor {
 
 ### 인터셉터 호출 흐름
 
+<img width="938" alt="Screenshot 2024-09-16 at 14 11 14" src="https://github.com/user-attachments/assets/6a92ac68-3d85-499d-aeba-04c008195f9f">
+
+
 * `preHandle` : 컨트롤러 호출 전에 호출된다. (더 정확히는 핸들러 어댑터 호출 전에 호출된다.)
 
 `preHandle` 의 응답값이 `true` 이면 다음으로 진행하고, `false` 이면 더는 진행하지 않는다. `false` 인 경우 나머지 인터셉터는 물론이고, 핸들러 어댑터도 호출되지 않는다. 그림에서
@@ -335,6 +338,9 @@ public interface HandlerInterceptor {
 * `afterCompletion` : 뷰가 렌더링 된 이후에 호출된다.
 
 ### 예외 발생
+
+<img width="905" alt="Screenshot 2024-09-16 at 14 13 03" src="https://github.com/user-attachments/assets/f81222b3-1872-460b-8e00-f7d5225c3feb">
+
 
 **예외가 발생시**
 
