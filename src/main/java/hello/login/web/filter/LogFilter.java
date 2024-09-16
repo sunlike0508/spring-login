@@ -39,7 +39,6 @@ public class LogFilter implements Filter {
             throw e;
         } finally {
             log.info("LogFilter doFilter end");
-            log.info("RESPONSE [{}][{}]", uuid, requestURI);
         }
     }
 
