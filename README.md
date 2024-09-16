@@ -327,7 +327,6 @@ public interface HandlerInterceptor {
 
 <img width="938" alt="Screenshot 2024-09-16 at 14 11 14" src="https://github.com/user-attachments/assets/6a92ac68-3d85-499d-aeba-04c008195f9f">
 
-
 * `preHandle` : 컨트롤러 호출 전에 호출된다. (더 정확히는 핸들러 어댑터 호출 전에 호출된다.)
 
 `preHandle` 의 응답값이 `true` 이면 다음으로 진행하고, `false` 이면 더는 진행하지 않는다. `false` 인 경우 나머지 인터셉터는 물론이고, 핸들러 어댑터도 호출되지 않는다. 그림에서
@@ -355,3 +354,36 @@ public interface HandlerInterceptor {
 예외가 발생하면 `postHandle()` 는 호출되지 않으므로 예외와 무관하게 공통 처리를 하려면 `afterCompletion()` 을 사용해야 한다.
 
 예외가 발생하면 `afterCompletion()` 에 예외 정보( `ex` )를 포함해서 호출된다.
+
+**구현**
+
+**HandlerMethod**
+
+핸들러 정보는 어떤 핸들러 매핑을 사용하는가에 따라 달라진다.
+
+스프링을 사용하면 일반적으로 `@Controller` , `@RequestMapping` 을 활용한 핸들러 매핑을 사용하는데, 이 경우 핸들러 정보로 `HandlerMethod` 가 넘어온다.
+
+**ResourceHttpRequestHandler**
+
+`@Controller` 가 아니라 `/resources/static` 와 같은 정적 리소스가 호출 되는 경우 `ResourceHttpRequestHandler` 가 핸들러 정보로 넘어오기 때문에 타입에 따라서
+처리가 필요하다.
+
+`String uuid = UUID.randomUUID().toString()`
+
+요청 로그를 구분하기 위한 `uuid` 를 생성한다.
+
+`request.setAttribute(LOG_ID, uuid)`
+
+서블릿 필터의 경우 지역변수로 해결이 가능하지만, 스프링 인터셉터는 호출 시점이 완전히 분리되어 있다. LogFilter의 doFilter 안에서만 uuid를 사용하기 때문에 지역변수로 두고 사용 가능하다.
+
+그러나 LogInterceptor안에 서는 각 메소드들이 나뉘어 실행되는 시점이 다르기 때문에 request에 담아두고 써야함.
+
+따라서 `preHandle` 에서 지정한 값을 `postHandle` , `afterCompletion` 에서 함께 사용하려면 어딘 가에 담아두어야 한다.
+
+`LogInterceptor` 도 싱글톤처럼 사용되기 때문에 맴버변수를 사용하면 위험하다.
+
+따라서 `request` 에 담아두었다. 이 값은 `afterCompletion` 에서 `request.getAttribute(LOG_ID)` 로 찾아서 사용한다.
+
+`return true`
+
+`true` 면 정상 호출이다. 다음 인터셉터나 컨트롤러가 호출된다.
